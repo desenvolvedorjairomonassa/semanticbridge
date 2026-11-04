@@ -72,53 +72,90 @@ SELECT
     CAST(ROUND(3.00 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(Prod_Seq, 'Price')))) % 2700) / 100.0, 2) AS DECIMAL(18,2)) AS List_Price
 FROM BaseProducts;
 
--- ----------------------------------------------------------------------------
--- 3. POPULAR DIM_OUTLET (50 Lojas)
--- ----------------------------------------------------------------------------
-WITH Numbers AS (
-    SELECT TOP 50 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS Id
-    FROM sys.all_columns
+-- ============================================================================
+-- 3. POPULAR DIM_OUTLET (50 Lojas) - Compatível com Fabric Warehouse
+-- Gera 50 IDs limpos sem consultar tabelas de sistema distribuídas
+-- ============================================================================
+
+WITH 
+-- Tabela de 10 dígitos (0 a 9)
+Digits AS (
+    SELECT v FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(v)
 ),
+-- Gera números de 1 a 50 via produto cartesiano puro em memória
+Numbers AS (
+    SELECT (d1.v * 10 + d2.v + 1) AS Id
+    FROM Digits d1
+    CROSS JOIN Digits d2
+    WHERE (d1.v * 10 + d2.v + 1) <= 50
+),
+-- Tipos de canal de loja
 OutletTypes AS (
     SELECT 0 AS Type_Id, 'Hypermarket' AS Outlet_Type UNION ALL
     SELECT 1, 'Supermarket' UNION ALL
     SELECT 2, 'Convenience' UNION ALL
     SELECT 3, 'E-Commerce'
 )
-INSERT INTO dbo.DIM_OUTLET (Outlet_Key, Outlet_Code, Outlet_Name, Outlet_Type, Territory_Key, Square_Feet)
+INSERT INTO dbo.DIM_OUTLET (
+    Outlet_Key, Outlet_Code, Outlet_Name, Outlet_Type, Territory_Key, Square_Feet
+)
 SELECT 
     n.Id AS Outlet_Key,
     CONCAT('OUT-', FORMAT(n.Id, '0000')) AS Outlet_Code,
     CONCAT('Retail Store ', n.Id) AS Outlet_Name,
     ot.Outlet_Type,
-    (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(n.Id, 'Territory')))) % 4) + 1 AS Territory_Key,
-    1500 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(n.Id, 'Square')))) % 43501) AS Square_Feet
+    (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(n.Id AS VARCHAR), 'Territory')))) % 4) + 1 AS Territory_Key,
+    1500 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(n.Id AS VARCHAR), 'Square')))) % 43501) AS Square_Feet
 FROM Numbers n
 JOIN OutletTypes ot 
-    ON ot.Type_Id = (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(n.Id, 'Type')))) % 4);
+    ON ot.Type_Id = (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(n.Id AS VARCHAR), 'Type')))) % 4);
 
--- ----------------------------------------------------------------------------
+-- ============================================================================
 -- 4. POPULAR DIM_DATE (731 Dias: 2024-01-01 a 2025-12-31)
--- ----------------------------------------------------------------------------
-WITH DateSeq AS (
-    SELECT TOP 731 
-        DATEADD(DAY, ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) - 1, '2024-01-01') AS Full_Date
-    FROM sys.all_columns a 
-    CROSS JOIN sys.all_columns b
+-- Compatível com o modo distribuído do Fabric Warehouse
+-- ============================================================================
+
+WITH 
+-- 10 dígitos na memória
+Digits AS (
+    SELECT v FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(v)
+),
+-- Gera números de 0 a 730 (exatamente 731 dias)
+DayNumbers AS (
+    SELECT (d1.v * 100 + d2.v * 10 + d3.v) AS DayOffset
+    FROM Digits d1
+    CROSS JOIN Digits d2
+    CROSS JOIN Digits d3
+    WHERE (d1.v * 100 + d2.v * 10 + d3.v) < 731
+),
+-- Calcula cada data a partir de 2024-01-01
+CalendarBase AS (
+    SELECT DATEADD(DAY, DayOffset, CAST('2024-01-01' AS DATE)) AS Full_Date
+    FROM DayNumbers
 )
 INSERT INTO dbo.DIM_DATE (
-    Date_Key, Full_Date, Year, Quarter, Month, Month_Name, Day_Of_Week, Is_Weekend
+    Date_Key, 
+    Full_Date, 
+    Year, 
+    Quarter, 
+    Month, 
+    Month_Name, 
+    Day_Of_Week, 
+    Is_Weekend
 )
 SELECT 
     CAST(FORMAT(Full_Date, 'yyyyMMdd') AS INT) AS Date_Key,
-    CAST(Full_Date AS DATE) AS Full_Date,
+    Full_Date,
     YEAR(Full_Date) AS Year,
     CONCAT(YEAR(Full_Date), 'Q', DATEPART(QUARTER, Full_Date)) AS Quarter,
     MONTH(Full_Date) AS Month,
     DATENAME(MONTH, Full_Date) AS Month_Name,
     DATENAME(WEEKDAY, Full_Date) AS Day_Of_Week,
-    CASE WHEN DATEPART(WEEKDAY, Full_Date) IN (1, 7) THEN 1 ELSE 0 END AS Is_Weekend
-FROM DateSeq;
+    CASE 
+        WHEN DATEPART(WEEKDAY, Full_Date) IN (1, 7) THEN 1 
+        ELSE 0 
+    END AS Is_Weekend
+FROM CalendarBase;
 
 -- ----------------------------------------------------------------------------
 -- 5. POPULAR TABELAS DE GOVERNANÇA, DRIFT E CONFLITO (ESTÁTICAS)
@@ -145,11 +182,16 @@ VALUES (1, '2024-10-20', 'FACT_SELL_IN', 'SCHEMA_COLUMN_RENAMED', 14, 142500.00,
 -- ----------------------------------------------------------------------------
 -- 6. POPULAR FACT_SELL_IN (10.000 Transações)
 -- ----------------------------------------------------------------------------
-WITH Generator AS (
-    SELECT TOP 10000 
-        ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS Seq
-    FROM sys.all_columns a 
-    CROSS JOIN sys.all_columns b
+WITH 
+Digits AS (
+    SELECT v FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(v)
+),
+Numbers10k AS (
+    SELECT (d1.v * 1000 + d2.v * 100 + d3.v * 10 + d4.v + 1) AS Seq
+    FROM Digits d1
+    CROSS JOIN Digits d2
+    CROSS JOIN Digits d3
+    CROSS JOIN Digits d4
 ),
 Dates2024 AS (
     SELECT Date_Key, ROW_NUMBER() OVER (ORDER BY Date_Key) AS Day_Num
@@ -161,22 +203,32 @@ INSERT INTO dbo.FACT_SELL_IN (
 )
 SELECT 
     d.Date_Key,
-    (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Dist')))) % 4) + 1 AS Distributor_Key,
-    1001 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Prod')))) % 27) AS Product_Key,
-    100 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Qty')))) % 1901) AS Shipped_Quantity,
-    CAST(ROUND(1000.00 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Amount')))) % 2400001) / 100.0, 2) AS DECIMAL(18,2)) AS Gross_Invoice_Amount
-FROM Generator g
+    (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Dist')))) % 4) + 1 AS Distributor_Key,
+    1001 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Prod')))) % 27) AS Product_Key,
+    100 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Qty')))) % 1901) AS Shipped_Quantity,
+    CAST(ROUND(1000.00 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Amount')))) % 2400001) / 100.0, 2) AS DECIMAL(18,2)) AS Gross_Invoice_Amount
+FROM Numbers10k g
 JOIN Dates2024 d 
-    ON d.Day_Num = ((ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Date')))) % 366) + 1);
+    ON d.Day_Num = ((ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Date')))) % 366) + 1);
 
 -- ----------------------------------------------------------------------------
 -- 7. POPULAR FACT_SELL_OUT (15.000 Transações)
 -- ----------------------------------------------------------------------------
-WITH Generator AS (
-    SELECT TOP 15000 
-        ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS Seq
-    FROM sys.all_columns a 
-    CROSS JOIN sys.all_columns b
+WITH 
+Digits AS (
+    SELECT v FROM (VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9)) AS t(v)
+),
+Tens AS (
+    SELECT v FROM (VALUES (0),(1)) AS t(v)
+),
+Numbers15k AS (
+    SELECT (t.v * 10000 + d1.v * 1000 + d2.v * 100 + d3.v * 10 + d4.v + 1) AS Seq
+    FROM Tens t
+    CROSS JOIN Digits d1
+    CROSS JOIN Digits d2
+    CROSS JOIN Digits d3
+    CROSS JOIN Digits d4
+    WHERE (t.v * 10000 + d1.v * 1000 + d2.v * 100 + d3.v * 10 + d4.v + 1) <= 15000
 ),
 Dates2024 AS (
     SELECT Date_Key, ROW_NUMBER() OVER (ORDER BY Date_Key) AS Day_Num
@@ -188,10 +240,23 @@ INSERT INTO dbo.FACT_SELL_OUT (
 )
 SELECT 
     d.Date_Key,
-    (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Outlet')))) % 50) + 1 AS Outlet_Key,
-    1001 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'ProdSO')))) % 27) AS Product_Key,
-    5 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'Units')))) % 146) AS Units_Sold,
-    CAST(ROUND(50.00 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'POSAmount')))) % 145001) / 100.0, 2) AS DECIMAL(18,2)) AS POS_Sales_Amount
-FROM Generator g
+    (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Outlet')))) % 50) + 1 AS Outlet_Key,
+    1001 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'ProdSO')))) % 27) AS Product_Key,
+    5 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'Units')))) % 146) AS Units_Sold,
+    CAST(ROUND(50.00 + (ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'POSAmount')))) % 145001) / 100.0, 2) AS DECIMAL(18,2)) AS POS_Sales_Amount
+FROM Numbers15k g
 JOIN Dates2024 d 
-    ON d.Day_Num = ((ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(g.Seq, 'DateSO')))) % 366) + 1);
+    ON d.Day_Num = ((ABS(CHECKSUM(HASHBYTES('MD5', CONCAT(CAST(g.Seq AS VARCHAR(20)), 'DateSO')))) % 366) + 1);
+
+-- check in the load 
+SELECT 'DIM_DATE' AS Tabela, COUNT(*) AS Qtd_Linhas FROM dbo.DIM_DATE UNION ALL
+SELECT 'DIM_GEOGRAPHY', COUNT(*) FROM dbo.DIM_GEOGRAPHY UNION ALL
+SELECT 'DIM_PRODUCT', COUNT(*) FROM dbo.DIM_PRODUCT UNION ALL
+SELECT 'DIM_OUTLET', COUNT(*) FROM dbo.DIM_OUTLET UNION ALL
+SELECT 'DIM_DISTRIBUTOR', COUNT(*) FROM dbo.DIM_DISTRIBUTOR UNION ALL
+SELECT 'DIM_MEASURE_CATALOG', COUNT(*) FROM dbo.DIM_MEASURE_CATALOG UNION ALL
+SELECT 'FACT_SELL_IN', COUNT(*) FROM dbo.FACT_SELL_IN UNION ALL
+SELECT 'FACT_SELL_OUT', COUNT(*) FROM dbo.FACT_SELL_OUT UNION ALL
+SELECT 'CONFLICT_LOG', COUNT(*) FROM dbo.CONFLICT_LOG UNION ALL
+SELECT 'XWALK', COUNT(*) FROM dbo.XWALK UNION ALL
+SELECT 'DRIFT_AUDIT', COUNT(*) FROM dbo.DRIFT_AUDIT;
