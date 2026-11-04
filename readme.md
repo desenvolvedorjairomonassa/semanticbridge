@@ -68,12 +68,12 @@ When executives query conversational AI interfaces (e.g., *"How many active dist
 
 | Deliverable | Description | Implementation Status |
 | :--- | :--- | :---: |
-| **1. Rationalisation Analysis** | Identification and elimination of duplicated dashboards across Sell-In, Sell-Out, and POS tiers. | ✅ Completed |
-| **2. Business Questions Library** | Catalog of agreed executive questions mapped 1-to-1 to ratified measures, owners, and definitions. | ✅ Completed |
-| **3. Direct Lake Semantic Model** | Fabric Warehouse star schema operating in Direct Lake mode; validated against control totals. | ✅ Completed |
-| **4. Fabric IQ Ontology** | Published entity-relationship graph binding outlets, distributors, brands, and territories. | ✅ Completed |
-| **5. Fabric Data Agent** | Conversational agent answering executive questions with certified definitions and quantified conflict refusals. | ✅ Completed |
-| **6. Catalog Certification** | Semantic model endorsed as **Certified** in OneLake Catalog with automated lineage. | ✅ Completed |
+| **1. Rationalisation Analysis** | Identification and elimination of duplicated dashboards across Sell-In, Sell-Out, and POS tiers. |  |
+| **2. Business Questions Library** | Catalog of agreed executive questions mapped 1-to-1 to ratified measures, owners, and definitions. | |
+| **3. Direct Lake Semantic Model** | Fabric Warehouse star schema operating in Direct Lake mode; validated against control totals. |  |
+| **4. Fabric IQ Ontology** | Published entity-relationship graph binding outlets, distributors, brands, and territories. | |
+| **5. Fabric Data Agent** | Conversational agent answering executive questions with certified definitions and quantified conflict refusals. |  |
+| **6. Catalog Certification** | Semantic model endorsed as **Certified** in OneLake Catalog with automated lineage. |  |
 
 ---
 
