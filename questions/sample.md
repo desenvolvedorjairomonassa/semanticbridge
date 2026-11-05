@@ -15,7 +15,6 @@ Aqui está a lista formatada em Markdown pronta para ser copiada e colada na doc
 | **7** | *What is the monthly trend of sell-in revenue for 2024?* | `FACT_SELL_IN` $\rightarrow$ `DIM_DATE[Month_Name]` | `SUM(FACT_SELL_IN[Gross_Invoice_Amount])` filtered by `Year = 2024` | 12-month shipment trajectory for factory sales.
 | **8** | *Are there any active schema drift events logged?* | `DRIFT_AUDIT` | Direct query on `DRIFT_AUDIT` | Returns Event ID 1 (`SCHEMA_COLUMN_RENAMED`, 14 affected outlets, $142,500 blast radius).
 | **9** | *Who owns the Active Distributors Contracted metric?* | `DIM_MEASURE_CATALOG` | Metadata query where `Certified_Measure_Name = 'Active_Distributors_Contracted'` | `Channel Management` (Governance Domain Steward).
-| **10** | **[REFUSAL SCENARIO]** *How many active distributors do we have?* | `CONFLICT_LOG`, `DIM_MEASURE_CATALOG`, `DIM_DISTRIBUTOR`, `FACT_SELL_IN` | Evaluates `[Active_Distributors_Contracted]` (48) vs `[Active_Distributors_Invoiced]` (42)
- | **Policy-driven refusal:** States the 12.50% variance gap and references domain stewardship rather than guessing.
+| **10** | **[REFUSAL SCENARIO]** *How many active distributors do we have?* | `CONFLICT_LOG`, `DIM_MEASURE_CATALOG`, `DIM_DISTRIBUTOR`, `FACT_SELL_IN` | Evaluates `[Active_Distributors_Contracted]` (48) vs `[Active_Distributors_Invoiced]` (42) | **Policy-driven refusal:** States the 12.50% variance gap and references domain stewardship rather than guessing.
 
  |
