@@ -217,3 +217,13 @@ the Commercial Domain Steward (steward-commercial@cpg-enterprise.com) to initiat
 * **Project:** SemanticBridge (Executive Semantic Model Factory)
 * **Target Industry:** Consumer Packaged Goods (CPG)
 * **Domain Stewards:** Commercial Governance Council & Enterprise Data Office
+
+## Author 
+| Name | Email |
+|------|-------|
+| Melissa Cozono | melissa_cozono@epam.com |
+| Alison Rodrigues | alison_rodrigues@epam.com |
+| Luiz Peixoto | luiz_peixoto@epam.com |
+| Janio Ribeiro | janio_ribeiro@epam.com |
+| Jairo Moreira | jairo_moreira@epam.com |
+
