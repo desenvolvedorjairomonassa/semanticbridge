@@ -1,0 +1,28 @@
+Product_Key,SKU_Code,Product_Name,Subcategory,Category,Brand,Unit_Cost,List_Price
+1001,SKU-BEV-SPA-001,Sparkling Water BrandVariant 1,Sparkling Water,Beverages,EcoBev,10.13,3.68
+1002,SKU-BEV-SPA-002,Sparkling Water BrandVariant 2,Sparkling Water,Beverages,EcoBev,5.21,9.03
+1003,SKU-BEV-SPA-003,Sparkling Water BrandVariant 3,Sparkling Water,Beverages,EcoBev,11.44,21.27
+1004,SKU-BEV-ENE-001,Energy Drink BrandVariant 1,Energy Drink,Beverages,EcoBev,13.54,5.35
+1005,SKU-BEV-ENE-002,Energy Drink BrandVariant 2,Energy Drink,Beverages,EcoBev,7.2,3.8
+1006,SKU-BEV-ENE-003,Energy Drink BrandVariant 3,Energy Drink,Beverages,EcoBev,4.45,16.64
+1007,SKU-BEV-ICE-001,Iced Tea BrandVariant 1,Iced Tea,Beverages,EcoBev,1.86,8.37
+1008,SKU-BEV-ICE-002,Iced Tea BrandVariant 2,Iced Tea,Beverages,EcoBev,10.27,17.71
+1009,SKU-BEV-ICE-003,Iced Tea BrandVariant 3,Iced Tea,Beverages,EcoBev,4.48,18.91
+1010,SKU-SNA-POT-001,Potato Chips BrandVariant 1,Potato Chips,Snacks,EcoSna,12.43,3.18
+1011,SKU-SNA-POT-002,Potato Chips BrandVariant 2,Potato Chips,Snacks,EcoSna,12.38,21.85
+1012,SKU-SNA-POT-003,Potato Chips BrandVariant 3,Potato Chips,Snacks,EcoSna,6.09,7.2
+1013,SKU-SNA-TOR-001,Tortilla Chips BrandVariant 1,Tortilla Chips,Snacks,EcoSna,14.42,12.09
+1014,SKU-SNA-TOR-002,Tortilla Chips BrandVariant 2,Tortilla Chips,Snacks,EcoSna,2.75,5.61
+1015,SKU-SNA-TOR-003,Tortilla Chips BrandVariant 3,Tortilla Chips,Snacks,EcoSna,12.94,19.3
+1016,SKU-SNA-PRO-001,Protein Bars BrandVariant 1,Protein Bars,Snacks,EcoSna,12.4,22.7
+1017,SKU-SNA-PRO-002,Protein Bars BrandVariant 2,Protein Bars,Snacks,EcoSna,8.74,29.27
+1018,SKU-SNA-PRO-003,Protein Bars BrandVariant 3,Protein Bars,Snacks,EcoSna,6.61,17.91
+1019,SKU-PER-SHA-001,Shampoo BrandVariant 1,Shampoo,Personal Care,EcoPer,12.7,19.7
+1020,SKU-PER-SHA-002,Shampoo BrandVariant 2,Shampoo,Personal Care,EcoPer,13.13,18.59
+1021,SKU-PER-SHA-003,Shampoo BrandVariant 3,Shampoo,Personal Care,EcoPer,11.01,4.24
+1022,SKU-PER-BOD-001,Body Wash BrandVariant 1,Body Wash,Personal Care,EcoPer,4.58,10.81
+1023,SKU-PER-BOD-002,Body Wash BrandVariant 2,Body Wash,Personal Care,EcoPer,2.58,9.29
+1024,SKU-PER-BOD-003,Body Wash BrandVariant 3,Body Wash,Personal Care,EcoPer,2.86,10.51
+1025,SKU-PER-HAN-001,Hand Sanitizer BrandVariant 1,Hand Sanitizer,Personal Care,EcoPer,10.08,12.85
+1026,SKU-PER-HAN-002,Hand Sanitizer BrandVariant 2,Hand Sanitizer,Personal Care,EcoPer,6.5,8.66
+1027,SKU-PER-HAN-003,Hand Sanitizer BrandVariant 3,Hand Sanitizer,Personal Care,EcoPer,5.1,28.29

@@ -1,0 +1,2 @@
+XWalk_ID,Source_System,Source_Entity_ID,Target_Entity_ID,Identity_Confidence_Score,Review_Status
+1,SAP_ECC,DIST_9981,DIST-001,0.82,DISPUTED

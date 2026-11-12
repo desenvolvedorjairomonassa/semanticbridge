@@ -1,0 +1,5 @@
+Distributor_Key,Distributor_Code,Distributor_Name,Tier,Valid_From_Date,Valid_To_Date,Is_Current_Version
+1,DIST-001,Global Logistics Corp,Tier 1,2024-01-01,2024-06-30,False
+2,DIST-001,Global Logistics & Supply Solutions,Tier 1,2024-07-01,9999-12-31,True
+3,DIST-002,Apex Distribution Partners,Tier 1,2024-01-01,9999-12-31,True
+4,DIST-003,FastTrack CPG Logistics,Tier 2,2024-01-01,9999-12-31,True

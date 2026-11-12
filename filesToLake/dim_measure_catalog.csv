@@ -1,0 +1,4 @@
+Measure_Key,Business_Question,Certified_Measure_Name,Owner,Definition
+1,What is total sell-in revenue by region?,Total Sell-In Revenue,Sales Operations,Sum of (Shipped Quantity * List Price) across all factory shipments.
+2,How many active distributors are currently contracted?,Active_Distributors_Contracted,Channel Management,Count of distributors with active contracts in the master ledger.
+3,What is the distributor inventory stock-out rate?,Inventory Stockout Rate,Supply Chain,Percentage of days where ending inventory equals zero.

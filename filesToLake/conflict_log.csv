@@ -1,0 +1,2 @@
+Log_ID,Date_Key,Territory_Key,Metric_Name,Invoiced_Active_Count,Contracted_Active_Count,Variance_Percentage,Status
+1,20241015,1,Active_Distributors,42,48,12.5,FLAGGED_CONFLICT

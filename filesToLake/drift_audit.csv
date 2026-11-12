@@ -1,0 +1,2 @@
+Audit_ID,Detection_Date,Source_Table,Drift_Type,Affected_Outlet_Count,Calculated_Blast_Radius_USD,Resolution_Status
+1,2024-10-20,FACT_SELL_IN,SCHEMA_COLUMN_RENAMED,14,142500.0,PENDING_REVIEW
